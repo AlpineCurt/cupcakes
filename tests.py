@@ -45,7 +45,7 @@ class CupcakeViewsTestCase(TestCase):
 
     def tearDown(self):
         """Clean up fouled transactions."""
-
+        
         db.session.rollback()
 
     def test_list_cupcakes(self):
