@@ -1,7 +1,7 @@
 """Flask app for Cupcakes"""
 
 from crypt import methods
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
 from models import db, connect_db, Cupcake
 
 app = Flask(__name__)
@@ -12,6 +12,10 @@ app.config['SQLALCHEMY_ECHO'] = True
 app.config['SECRET_KEY'] = 'oh-so-secret'
 
 connect_db(app)
+
+@app.route("/")
+def home_page():
+    return render_template("index.html")
 
 @app.route("/api/cupcakes")
 def get_all_cupcakes():
