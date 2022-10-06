@@ -1,12 +1,14 @@
 """Flask app for Cupcakes"""
 
-from flask import Flask, request, jsonify, render_template
+from crypt import methods
+from flask import Flask, request, jsonify
 from models import db, connect_db, Cupcake
 
 app = Flask(__name__)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///cupcakes'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SQLALCHEMY_ECHO'] = True
 app.config['SECRET_KEY'] = 'oh-so-secret'
 
 connect_db(app)
@@ -48,5 +50,22 @@ def create_cupcake():
 
     db.session.add(new_cupcake)
     db.session.commit()
-    response_json = jsonify(new_cupcake.serialize())
+    response_json = jsonify(cupcake=new_cupcake.serialize())
     return (response_json, 201)
+
+@app.route("/api/cupcakes/<int:id>", methods=["PATCH"])
+def update_cupcake(id):
+    cupcake = Cupcake.query.get_or_404(id)
+    cupcake.flavor = request.json['flavor']
+    cupcake.size = request.json['size']
+    cupcake.rating = request.json['rating']
+    cupcake.image = request.json['image']
+    db.session.commit()
+    return jsonify(cupcake=cupcake.serialize())
+
+@app.route("/api/cupcakes/<int:id>", methods=["DELETE"])
+def delete_cupcake(id):
+    cupcake = Cupcake.query.get_or_404(id)
+    db.session.delete(cupcake)
+    db.session.commit()
+    return jsonify(message="Deleted")
